@@ -11,7 +11,6 @@ import { validateSections } from "../codegen/validateSections";
 import { generatePage } from "../codegen/generatePage";
 import { injectTheme } from "../codegen/injectTheme";
 
-
 const router = Router();
 
 // ─── Resolve paths relative to the monorepo root ──────────────────────────────
@@ -20,8 +19,118 @@ const router = Router();
 // so we walk up to monorepo root: 4 levels up
 const MONOREPO_ROOT = path.resolve(__dirname, "../../../../");
 const TEMPLATES_STARTER = path.join(MONOREPO_ROOT, "templates", "starter");
-const PACKAGES_SECTIONS = path.join(MONOREPO_ROOT, "packages", "sections", "src");
+const DUMMY_BLITZ_CLONE = path.join(
+  MONOREPO_ROOT,
+  "dummy-templates",
+  "blitz-clone",
+);
+const DUMMY_WEB_COHORT = path.join(
+  MONOREPO_ROOT,
+  "dummy-templates",
+  "Web-Cohort",
+);
+const PACKAGES_SECTIONS = path.join(
+  MONOREPO_ROOT,
+  "packages",
+  "sections",
+  "src",
+);
 const PACKAGES_UI = path.join(MONOREPO_ROOT, "packages", "ui", "src");
+
+function resolveTemplateScaffold(templatePreset: string): string {
+  switch (templatePreset) {
+    case "blitz-clone":
+      return DUMMY_BLITZ_CLONE;
+    case "web-cohort":
+      return DUMMY_WEB_COHORT;
+    case "starter":
+    case "authantimate":
+    default:
+      return TEMPLATES_STARTER;
+  }
+}
+
+function resolveTemplateEntryPoint(templatePreset: string): string {
+  switch (templatePreset) {
+    case "blitz-clone":
+      return path.join("src", "app", "page.tsx");
+    case "web-cohort":
+      return path.join("src", "App.tsx");
+    case "starter":
+    case "authantimate":
+    default:
+      return path.join("src", "pages", "index.tsx");
+  }
+}
+
+function resolveTemplateThemeFile(templatePreset: string): string {
+  switch (templatePreset) {
+    case "blitz-clone":
+      return path.join("src", "app", "globals.css");
+    case "web-cohort":
+      return path.join("src", "index.css");
+    case "starter":
+    case "authantimate":
+    default:
+      return path.join("src", "styles", "theme.css");
+  }
+}
+
+async function patchWebCohortAliases(workspaceDir: string) {
+  const viteConfig = `import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { fileURLToPath, URL } from "node:url";
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      "@/sections": fileURLToPath(new URL("./src/sections", import.meta.url)),
+      "@/ui": fileURLToPath(new URL("./src/ui", import.meta.url)),
+    },
+  },
+});
+`;
+
+  const tsconfigApp = `{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/sections/*": ["./src/sections/*"],
+      "@/ui/*": ["./src/ui/*"]
+    }
+  },
+  "include": ["src"]
+}
+`;
+
+  await fse.outputFile(
+    path.join(workspaceDir, "vite.config.ts"),
+    viteConfig,
+    "utf-8",
+  );
+  await fse.outputFile(
+    path.join(workspaceDir, "tsconfig.app.json"),
+    tsconfigApp,
+    "utf-8",
+  );
+}
 
 // ─── POST /generate ────────────────────────────────────────────────────────────
 
@@ -37,10 +146,15 @@ router.post("/generate", async (req: Request, res: Response) => {
     return;
   }
 
-  const { projectName, repoName, config, githubToken, githubOwner, projectId } = parseResult.data;
+  const { projectName, repoName, config, githubToken, githubOwner, projectId } =
+    parseResult.data;
+  const templatePreset = config.templatePreset ?? "starter";
 
   // 2. Validate section props against per-section schemas
-  let validatedSections: Array<{ type: string; props: Record<string, unknown> }>;
+  let validatedSections: Array<{
+    type: string;
+    props: Record<string, unknown>;
+  }>;
   try {
     validatedSections = validateSections(config.sections);
   } catch (err: unknown) {
@@ -59,36 +173,56 @@ router.post("/generate", async (req: Request, res: Response) => {
   try {
     // 4. Copy starter template
     await fse.ensureDir(workspaceDir);
-    await fse.copy(TEMPLATES_STARTER, workspaceDir, { overwrite: true });
+    await fse.copy(resolveTemplateScaffold(templatePreset), workspaceDir, {
+      overwrite: true,
+    });
+
+    if (templatePreset === "web-cohort") {
+      await patchWebCohortAliases(workspaceDir);
+    }
 
     // 5. Copy packages/sections + packages/ui into the workspace
-    await fse.copy(PACKAGES_SECTIONS, path.join(workspaceDir, "src", "sections"), { overwrite: true });
-    await fse.copy(PACKAGES_UI, path.join(workspaceDir, "src", "ui"), { overwrite: true });
+    await fse.copy(
+      PACKAGES_SECTIONS,
+      path.join(workspaceDir, "src", "sections"),
+      { overwrite: true },
+    );
+    await fse.copy(PACKAGES_UI, path.join(workspaceDir, "src", "ui"), {
+      overwrite: true,
+    });
 
     // 6. Generate page file
     const pageContent = generatePage(validatedSections);
     await fse.outputFile(
-      path.join(workspaceDir, "src", "pages", "index.tsx"),
+      path.join(workspaceDir, resolveTemplateEntryPoint(templatePreset)),
       pageContent,
-      "utf-8"
+      "utf-8",
     );
 
     // 7. Inject theme CSS
     const themeCSS = injectTheme(config.theme);
-    await fse.outputFile(
-      path.join(workspaceDir, "src", "styles", "theme.css"),
-      themeCSS,
-      "utf-8"
+    const themeFile = path.join(
+      workspaceDir,
+      resolveTemplateThemeFile(templatePreset),
     );
+    if (templatePreset === "starter" || templatePreset === "authantimate") {
+      await fse.outputFile(themeFile, themeCSS, "utf-8");
+    } else {
+      await fse.appendFile(themeFile, `\n\n${themeCSS}`, "utf-8");
+    }
 
     // 8. Write package.json with project name
-    const pkgJson = await fse.readJson(path.join(workspaceDir, "package.json")) as Record<string, unknown>;
+    const pkgJson = (await fse.readJson(
+      path.join(workspaceDir, "package.json"),
+    )) as Record<string, unknown>;
     pkgJson["name"] = projectName;
-    await fse.writeJson(path.join(workspaceDir, "package.json"), pkgJson, { spaces: 2 });
+    await fse.writeJson(path.join(workspaceDir, "package.json"), pkgJson, {
+      spaces: 2,
+    });
 
     // 9. GitHub integration
     let repoUrl = `local://${workspaceDir}`;
-    
+
     const finalGithubToken = githubToken || process.env.GITHUB_TOKEN;
 
     if (finalGithubToken && githubOwner) {
@@ -115,12 +249,15 @@ router.post("/generate", async (req: Request, res: Response) => {
         // Push
         await git.addRemote(
           "origin",
-          `https://${finalGithubToken}@github.com/${githubOwner}/${repoName}.git`
+          `https://${finalGithubToken}@github.com/${githubOwner}/${repoName}.git`,
         );
         await git.push("origin", "main", ["--set-upstream"]);
       } catch (gitErr: unknown) {
         // GitHub push failed — still return local success
-        console.error("[generate] GitHub push failed:", (gitErr as Error).message);
+        console.error(
+          "[generate] GitHub push failed:",
+          (gitErr as Error).message,
+        );
         repoUrl = `local://${workspaceDir}`;
       }
     }

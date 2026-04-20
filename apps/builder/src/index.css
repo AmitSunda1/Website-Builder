@@ -1,9 +1,15 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 html,
@@ -42,4 +48,31 @@ input,
 select,
 textarea {
   font-family: inherit;
+}
+
+/* ─── Blitz Design Tokens ────────────────────────────────────────── */
+:root {
+  /* Colors */
+  --blitz-blue: #2563eb;
+  --blitz-blue-hover: #1d4ed8;
+  --blitz-purple: #7c3aed;
+  --blitz-black: #0a0a0a;
+  --blitz-white: #ffffff;
+  --blitz-gray-50: #f9fafb;
+  --blitz-gray-100: #f3f4f6;
+  --blitz-gray-200: #e5e7eb;
+  --blitz-gray-300: #d1d5db;
+  --blitz-gray-400: #9ca3af;
+  --blitz-gray-500: #6b7280;
+  --blitz-gray-600: #4b5563;
+  --blitz-gray-800: #1f2937;
+  --blitz-gray-900: #111827;
+
+  /* Hero gradient */
+  --blitz-hero-bg: #eef2ff;
+
+  /* Spacing */
+  --blitz-section-py: 96px;
+  --blitz-section-px: 40px;
+  --blitz-container-max: 1200px;
 }

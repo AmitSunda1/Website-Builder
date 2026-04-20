@@ -2,6 +2,7 @@ import React from "react";
 import { BuilderProvider, useBuilderState, useBuilderDispatch } from "./BuilderContext";
 import { SectionPicker } from "./components/SectionPicker";
 import { SectionList } from "./components/SectionList";
+import { TemplatePicker } from "./components/TemplatePicker";
 import { PropEditor } from "./components/PropEditor";
 import { ThemeEditor } from "./components/ThemeEditor";
 import { ExportPanel } from "./components/ExportPanel";
@@ -54,6 +55,8 @@ function MainLayout() {
                 <SectionList />
               </div>
               <PropEditor />
+              <div style={{ height: "1px", backgroundColor: "#2a2a3a" }} />
+              <TemplatePicker />
               <div style={{ height: "1px", backgroundColor: "#2a2a3a" }} />
               <SectionPicker />
             </div>

@@ -1,0 +1,27 @@
+packages/sections/src/authantimate/Testimonial.tsx(7,38): error TS7016: Could not find a declaration file for module 'swiper'. '/Users/amitsunda/Desktop/Code/CU/website-builder-v2/node_modules/swiper/swiper.esm.js' implicitly has an 'any' type.
+  There are types at '/Users/amitsunda/Desktop/Code/CU/website-builder-v2/node_modules/swiper/swiper.d.ts', but this result could not be resolved when respecting package.json "exports". The 'swiper' library may need to update its package.json or typings.
+packages/sections/src/web-cohort/internal/components.tsx(247,92): error TS2532: Object is possibly 'undefined'.
+packages/sections/src/web-cohort/internal/components.tsx(248,50): error TS2532: Object is possibly 'undefined'.
+packages/sections/src/web-cohort/WebCohortFooter.tsx(64,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: { component: ElementType<any, keyof IntrinsicElements>; } & TypographyOwnProps & CommonProps & Omit<any, "children" | ... 112 more ... | "variantMapping">): Element | null', gave the following error.
+    Type '{ text: string; highlight: boolean; }[]' is not assignable to type 'ReactNode'.
+      Type '{ text: string; highlight: boolean; }[]' is not assignable to type 'Iterable<ReactNode>'.
+        The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+          Type 'IteratorResult<{ text: string; highlight: boolean; }, undefined>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+            Type 'IteratorYieldResult<{ text: string; highlight: boolean; }>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+              Type 'IteratorYieldResult<{ text: string; highlight: boolean; }>' is not assignable to type 'IteratorYieldResult<ReactNode>'.
+                Type '{ text: string; highlight: boolean; }' is not assignable to type 'ReactNode'.
+  Overload 2 of 2, '(props: DefaultComponentProps<TypographyTypeMap<{}, "span">>): Element | null', gave the following error.
+    Type '{ text: string; highlight: boolean; }[]' is not assignable to type 'ReactNode'.
+      Type '{ text: string; highlight: boolean; }[]' is not assignable to type 'Iterable<ReactNode>'.
+        The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+          Type 'IteratorResult<{ text: string; highlight: boolean; }, undefined>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+            Type 'IteratorYieldResult<{ text: string; highlight: boolean; }>' is not assignable to type 'IteratorResult<ReactNode, any>'.
+              Type 'IteratorYieldResult<{ text: string; highlight: boolean; }>' is not assignable to type 'IteratorYieldResult<ReactNode>'.
+                Type '{ text: string; highlight: boolean; }' is not assignable to type 'ReactNode'.
+packages/sections/src/web-cohort/WebCohortHero.tsx(182,14): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: { component: ElementType<any, keyof IntrinsicElements>; } & GridBaseProps & { sx?: SxProps<Theme> | undefined; } & SystemProps<...> & Omit<...>): Element | null', gave the following error.
+    Property 'component' is missing in type '{ children: Element; item: true; xs: number; md: number; key: number; }' but required in type '{ component: ElementType<any, keyof IntrinsicElements>; }'.
+  Overload 2 of 2, '(props: DefaultComponentProps<GridTypeMap<{}, "div">>): Element | null', gave the following error.
+    Type '{ children: Element; item: true; xs: number; md: number; key: number; }' is not assignable to type 'IntrinsicAttributes & GridBaseProps & { sx?: SxProps<Theme> | undefined; } & SystemProps<Theme> & Omit<...>'.
+      Property 'item' does not exist on type 'IntrinsicAttributes & GridBaseProps & { sx?: SxProps<Theme> | undefined; } & SystemProps<Theme> & Omit<...>'.

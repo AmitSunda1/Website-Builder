@@ -45,3 +45,15 @@ export interface GenerateResponse {
 // ─── Builder state ────────────────────────────────────────────────────────────
 
 export type PanelTab = "sections" | "theme" | "export";
+
+export type StylePreset =
+  | "all"
+  | "core"
+  | "authantimate"
+  | "blitz-clone"
+  | "web-cohort";
+export type TemplatePreset =
+  | "starter"
+  | "authantimate"
+  | "blitz-clone"
+  | "web-cohort";

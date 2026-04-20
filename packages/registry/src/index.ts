@@ -34,5 +34,5 @@ export function listComponents(): Array<[string, RegistryEntry]> {
 
 // ─── Re-exports ───────────────────────────────────────────────────────────────
 
-export { registry, ALLOWED_SECTION_TYPES } from "./registry";
-export type { RegistryEntry } from "./registry";
+export { registry, ALLOWED_SECTION_TYPES, TEMPLATE_PRESETS } from "./registry";
+export type { RegistryEntry, TemplateDefinition } from "./registry";

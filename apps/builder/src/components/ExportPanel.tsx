@@ -25,7 +25,11 @@ export function ExportPanel() {
         projectName: state.projectName,
         repoName: state.repoName,
         config: {
-          sections: state.sections.map((s) => ({ type: s.type, props: s.props })),
+          templatePreset: state.templatePreset,
+          sections: state.sections.map((s) => ({
+            type: s.type,
+            props: s.props,
+          })),
           theme: state.theme,
         },
         projectId: state.projectId,
@@ -70,7 +74,10 @@ export function ExportPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           projectId: state.projectId,
-          sections: state.sections.map((s) => ({ type: s.type, props: s.props })),
+          sections: state.sections.map((s) => ({
+            type: s.type,
+            props: s.props,
+          })),
         }),
       });
 
@@ -90,7 +97,16 @@ export function ExportPanel() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div>
-        <h3 style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#6b7280", margin: "0 0 8px 0" }}>
+        <h3
+          style={{
+            fontSize: "11px",
+            fontWeight: 700,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: "#6b7280",
+            margin: "0 0 8px 0",
+          }}
+        >
           Project Settings
         </h3>
       </div>
@@ -101,7 +117,9 @@ export function ExportPanel() {
           id="project-name"
           type="text"
           value={state.projectName}
-          onChange={(e) => dispatch({ type: "SET_PROJECT_NAME", name: e.target.value })}
+          onChange={(e) =>
+            dispatch({ type: "SET_PROJECT_NAME", name: e.target.value })
+          }
           placeholder="my-website"
           style={inputStyle}
         />
@@ -113,15 +131,51 @@ export function ExportPanel() {
           id="repo-name"
           type="text"
           value={state.repoName}
-          onChange={(e) => dispatch({ type: "SET_REPO_NAME", name: e.target.value })}
+          onChange={(e) =>
+            dispatch({ type: "SET_REPO_NAME", name: e.target.value })
+          }
           placeholder="my-website"
           style={inputStyle}
         />
       </Field>
+      <Field label="Template Shell" id="template-shell">
+        <select
+          id="template-shell"
+          value={state.templatePreset}
+          onChange={(e) =>
+            dispatch({
+              type: "SET_TEMPLATE_PRESET",
+              preset: e.target.value as typeof state.templatePreset,
+            })
+          }
+          style={inputStyle}
+        >
+          <option value="starter">Starter</option>
+          <option value="authantimate">AuthentiMATE</option>
+          <option value="blitz-clone">Blitz Clone</option>
+          <option value="web-cohort">Web Cohort</option>
+        </select>
+      </Field>
 
       {/* GitHub section */}
-      <div style={{ padding: "16px", backgroundColor: "#1a1a24", borderRadius: "8px", border: "1px solid #2a2a3a" }}>
-        <div style={{ fontSize: "11px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
+      <div
+        style={{
+          padding: "16px",
+          backgroundColor: "#1a1a24",
+          borderRadius: "8px",
+          border: "1px solid #2a2a3a",
+        }}
+      >
+        <div
+          style={{
+            fontSize: "11px",
+            fontWeight: 700,
+            color: "#6b7280",
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            marginBottom: "12px",
+          }}
+        >
           GitHub Integration (optional)
         </div>
 
@@ -131,7 +185,9 @@ export function ExportPanel() {
               id="gh-owner"
               type="text"
               value={state.githubOwner}
-              onChange={(e) => dispatch({ type: "SET_GITHUB_OWNER", owner: e.target.value })}
+              onChange={(e) =>
+                dispatch({ type: "SET_GITHUB_OWNER", owner: e.target.value })
+              }
               placeholder="username or org"
               style={inputStyle}
             />
@@ -141,30 +197,65 @@ export function ExportPanel() {
 
       {/* Error */}
       {error && (
-        <div style={{ padding: "12px", backgroundColor: "#ef444415", border: "1px solid #ef444440", borderRadius: "8px", fontSize: "12px", color: "#fca5a5", lineHeight: "1.5" }}>
+        <div
+          style={{
+            padding: "12px",
+            backgroundColor: "#ef444415",
+            border: "1px solid #ef444440",
+            borderRadius: "8px",
+            fontSize: "12px",
+            color: "#fca5a5",
+            lineHeight: "1.5",
+          }}
+        >
           ⚠ {error}
         </div>
       )}
 
       {/* Success */}
       {result && (
-        <div style={{ padding: "16px", backgroundColor: "#22c55e15", border: "1px solid #22c55e40", borderRadius: "8px", display: "flex", flexDirection: "column", gap: "8px" }}>
-          <div style={{ fontSize: "13px", fontWeight: 700, color: "#4ade80" }}>✓ Generated successfully!</div>
+        <div
+          style={{
+            padding: "16px",
+            backgroundColor: "#22c55e15",
+            border: "1px solid #22c55e40",
+            borderRadius: "8px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+          }}
+        >
+          <div style={{ fontSize: "13px", fontWeight: 700, color: "#4ade80" }}>
+            ✓ Generated successfully!
+          </div>
           <div style={{ fontSize: "11px", color: "#6b7280" }}>
-            {result.sectionsCount} section{(result.sectionsCount ?? 0) > 1 ? "s" : ""} • Project: {state.projectName}
+            {result.sectionsCount} section
+            {(result.sectionsCount ?? 0) > 1 ? "s" : ""} • Project:{" "}
+            {state.projectName}
           </div>
           {result.repoUrl && !result.repoUrl.startsWith("local://") && (
             <a
               href={result.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ fontSize: "12px", color: "#6366f1", textDecoration: "none", wordBreak: "break-all" }}
+              style={{
+                fontSize: "12px",
+                color: "#6366f1",
+                textDecoration: "none",
+                wordBreak: "break-all",
+              }}
             >
               {result.repoUrl} ↗
             </a>
           )}
           {result.workspaceDir && (
-            <code style={{ fontSize: "10px", color: "#6b7280", wordBreak: "break-all" }}>
+            <code
+              style={{
+                fontSize: "10px",
+                color: "#6b7280",
+                wordBreak: "break-all",
+              }}
+            >
               {result.workspaceDir}
             </code>
           )}
@@ -180,7 +271,8 @@ export function ExportPanel() {
             disabled={isHydrating || isLoading || state.sections.length === 0}
             style={{
               padding: "14px",
-              backgroundColor: state.sections.length === 0 ? "#2a2a3a" : "#22c55e",
+              backgroundColor:
+                state.sections.length === 0 ? "#2a2a3a" : "#22c55e",
               color: state.sections.length === 0 ? "#4a4a6a" : "#ffffff",
               border: "none",
               borderRadius: "8px",
@@ -211,7 +303,8 @@ export function ExportPanel() {
           disabled={isLoading || isHydrating || state.sections.length === 0}
           style={{
             padding: "14px",
-            backgroundColor: state.sections.length === 0 ? "#2a2a3a" : "#6366f1",
+            backgroundColor:
+              state.sections.length === 0 ? "#2a2a3a" : "#6366f1",
             color: state.sections.length === 0 ? "#4a4a6a" : "#ffffff",
             border: "none",
             borderRadius: "8px",
@@ -237,17 +330,42 @@ export function ExportPanel() {
         </button>
       </div>
 
-      <p style={{ fontSize: "11px", color: "#4a4a6a", textAlign: "center", lineHeight: "1.5" }}>
-        Creates a local Vite project. With GitHub credentials, also creates a repo and pushes.
+      <p
+        style={{
+          fontSize: "11px",
+          color: "#4a4a6a",
+          textAlign: "center",
+          lineHeight: "1.5",
+        }}
+      >
+        Creates a local Vite project. With GitHub credentials, also creates a
+        repo and pushes.
       </p>
     </div>
   );
 }
 
-function Field({ label, id, children }: { label: string; id: string; children: React.ReactNode }) {
+function Field({
+  label,
+  id,
+  children,
+}: {
+  label: string;
+  id: string;
+  children: React.ReactNode;
+}) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-      <label htmlFor={id} style={{ fontSize: "11px", fontWeight: 600, color: "#a0a0b8", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+      <label
+        htmlFor={id}
+        style={{
+          fontSize: "11px",
+          fontWeight: 600,
+          color: "#a0a0b8",
+          textTransform: "uppercase",
+          letterSpacing: "0.06em",
+        }}
+      >
         {label}
       </label>
       {children}
@@ -257,15 +375,17 @@ function Field({ label, id, children }: { label: string; id: string; children: R
 
 function Spinner() {
   return (
-    <span style={{
-      width: "14px",
-      height: "14px",
-      border: "2px solid rgba(255,255,255,0.3)",
-      borderTopColor: "#ffffff",
-      borderRadius: "50%",
-      display: "inline-block",
-      animation: "spin 0.6s linear infinite",
-    }} />
+    <span
+      style={{
+        width: "14px",
+        height: "14px",
+        border: "2px solid rgba(255,255,255,0.3)",
+        borderTopColor: "#ffffff",
+        borderRadius: "50%",
+        display: "inline-block",
+        animation: "spin 0.6s linear infinite",
+      }}
+    />
   );
 }
 

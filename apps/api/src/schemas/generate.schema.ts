@@ -7,7 +7,9 @@ export const sectionConfigSchema = z.object({
   /** Must be a registered type */
   type: z.string().refine(
     (t) => (ALLOWED_SECTION_TYPES as string[]).includes(t),
-    (t) => ({ message: `Unknown section type: "${t}". Allowed: ${ALLOWED_SECTION_TYPES.join(", ")}` })
+    (t) => ({
+      message: `Unknown section type: "${t}". Allowed: ${ALLOWED_SECTION_TYPES.join(", ")}`,
+    }),
   ),
   /** Raw props — validated against the per-section schema in the pipeline */
   props: z.record(z.unknown()),
@@ -20,11 +22,27 @@ export const themeConfigSchema = z.object({
   colors: z
     .object({
       primary: z.string().regex(/^#[0-9a-fA-F]{3,8}$/, "Must be a hex color"),
-      primaryFg: z.string().regex(/^#[0-9a-fA-F]{3,8}$/).optional().default("#ffffff"),
-      secondary: z.string().regex(/^#[0-9a-fA-F]{3,8}$/).optional(),
-      background: z.string().regex(/^#[0-9a-fA-F]{3,8}$/).optional(),
-      surface: z.string().regex(/^#[0-9a-fA-F]{3,8}$/).optional(),
-      text: z.string().regex(/^#[0-9a-fA-F]{3,8}$/).optional(),
+      primaryFg: z
+        .string()
+        .regex(/^#[0-9a-fA-F]{3,8}$/)
+        .optional()
+        .default("#ffffff"),
+      secondary: z
+        .string()
+        .regex(/^#[0-9a-fA-F]{3,8}$/)
+        .optional(),
+      background: z
+        .string()
+        .regex(/^#[0-9a-fA-F]{3,8}$/)
+        .optional(),
+      surface: z
+        .string()
+        .regex(/^#[0-9a-fA-F]{3,8}$/)
+        .optional(),
+      text: z
+        .string()
+        .regex(/^#[0-9a-fA-F]{3,8}$/)
+        .optional(),
     })
     .optional(),
   typography: z
@@ -41,13 +59,20 @@ export const generateRequestSchema = z.object({
     .string()
     .min(1)
     .max(64)
-    .regex(/^[a-z0-9-]+$/, "Only lowercase letters, numbers, and hyphens allowed"),
+    .regex(
+      /^[a-z0-9-]+$/,
+      "Only lowercase letters, numbers, and hyphens allowed",
+    ),
   repoName: z
     .string()
     .min(1)
     .max(100)
     .regex(/^[a-zA-Z0-9_.-]+$/, "Invalid repo name"),
   config: z.object({
+    templatePreset: z
+      .enum(["starter", "authantimate", "blitz-clone", "web-cohort"])
+      .optional()
+      .default("starter"),
     sections: z.array(sectionConfigSchema).min(1).max(20),
     theme: themeConfigSchema,
   }),
